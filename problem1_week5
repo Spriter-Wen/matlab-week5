@@ -1,0 +1,59 @@
+%基本数值计算方法小组作业
+%第5周习题第1题
+
+%第6组 20200405
+%二分法求方程的根
+
+close all;
+clear all;
+clc;
+
+f1 = @(x)(exp(x) + 10*x -2);
+
+maxits = 30;  %最大迭代次数  
+tolerance = 0.5e-2;     %容许误差
+
+x1 = 0; %区间左边界
+x2 = 1; %右边界
+
+[root,iterations] = bin_sec(f1,x1,x2,maxits,tolerance);
+
+if iterations == 30
+    disp('No root found')
+else
+    disp(['Root = ' num2str(root) ' found in ' ...
+        int2str(iterations) ' iterations.'])
+end
+
+
+%二分法求根
+%不能解决多根和根处导数为0的情况
+%fun为待求根函数(fun(x0)=0)
+%x1为区间左边界，x2为右边界
+%maxits为最大迭代次数
+%tolerance为容许误差
+function [value,iterations] = bin_sec(fun,x1,x2,maxits,tolerance)
+    %区间内无根或有多根的情况
+    if feval(fun,x1)*feval(fun,x2)>0
+        disp('Wrong range.')
+        return
+    end
+    
+    iterations = 0;
+    while  iterations < maxits && x2-x1>tolerance
+        iterations = iterations+1;
+        c = (x1+x2)/2;
+        
+        if feval(fun,c)==0
+            value = c;
+            return
+        end
+        
+        if feval(fun,c)*feval(fun,x1)<0
+            x2 = c;
+        else x1 = c;
+        end
+        
+        value = (x1+x2)/2;
+    end
+end
