@@ -1,0 +1,62 @@
+%基本数值计算方法小组作业
+%第5周习题第8题
+
+%第6组 20200405
+%牛顿-拉弗森法解第8题
+
+close all;
+clear all;
+clc;
+
+%已知条件
+w = 10;
+y0 = 5;
+x = 50;
+y = 15;
+
+f1 = @(T)(T/w*cosh(w*x/T) +y0 - T/w -y);
+diff_f1 = @(T)((1/w) * (-1 + cosh(w*x/T)) - x*sinh(w*x/T)/T);
+
+T = 50;     %迭代初始值
+maxits = 30;    %最大迭代次数
+tolerance = 1e-5;   %容许误差
+
+[root,iterations] = newton_method(f1,diff_f1,T,maxits,tolerance);
+
+%打印结果
+disp('Newton-Raphson method:');
+disp(['T_A= ',num2str(root),'N found in ',num2str(iterations),' iterations.']);
+
+%画图
+x = (-50:0.1:100);
+y = root*cosh(10.*x/root)/10+5-root/10;
+plot(x,y)
+title('缆线的高度与水平位置的关系');
+xlabel('水平位置x/m');
+ylabel('缆线高度y/m');
+grid on
+
+ %牛顿法求解fun = 0的根
+ %fun为待求根函数，diff_fun为fun的一阶导数
+ %x0为迭代初始值
+ %maxits为最大迭代次数
+ %tolerance为容许误差
+ 
+function [value,iterations] = newton_method(fun,diff_fun,x0,maxits,tolerance)
+    
+    iterations = 1;     %第一次迭代
+    x1 = x0 - feval(fun,x0)/feval(diff_fun,x0); %x1 = x0 - f(x0)/f'(x0)
+    
+    while abs(x1-x0)>tolerance && iterations < maxits
+        iterations = iterations + 1;
+        x0 = x1;
+        x1 = x0 - feval(fun,x0)/feval(diff_fun,x0);
+    end
+    
+    value = x1;
+    
+    if iterations == maxits || value == Inf || value ==-Inf
+        disp('Something wrong occured.');
+        disp('Please check the function and initial conditions.');
+    end
+end
