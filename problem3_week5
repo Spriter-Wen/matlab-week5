@@ -1,0 +1,71 @@
+%基本数值计算方法小组作业
+%第5周习题第3题
+
+%第6组 20200405
+%定点迭代法和使用Aitken法加速的定点迭代法求方程的根并比较
+
+close all;
+clear all;
+clc;
+
+f1 = @(x)(log(x + 2));  %待求解函数
+
+maxits = 30;    %最大迭代次数
+tolerance = 1e-4;   %容许误差
+
+x0 = 0.5;   %起始值
+
+[root1,iterations1] = fixed_point(f1,x0,maxits,tolerance);
+[root2,iterations2] = A_fixed_point(f1,x0,maxits,tolerance);
+
+disp(['Fixed point method:','Root= ',num2str(root1),' found in '...
+      num2str(iterations1),' iterations']);
+disp(['With Aitken method:','Root= ',num2str(root2),' found in '...
+      num2str(iterations2),' iterations']);
+
+%定点迭代法求根
+%fun为待求根函数
+%x0为迭代起始值
+%maxits为最大迭代次数
+%tolerance为容许误差
+%不能解决发散的情况，使用前需要考察函数是否适合用定点迭代法求根
+
+function [value,iterations] = fixed_point(fun,x0,maxits,tolerance)
+    
+    x1 = feval(fun,x0);
+    iterations = 1;     %第一次迭代
+    while abs(x1-x0)>tolerance && iterations<maxits
+        iterations = iterations +1 ;
+        x0 = x1;
+        x1 = feval(fun,x0);
+    end
+    
+    value = x1;
+    
+    if iterations == maxits || value == inf  ||value == -Inf
+        disp('Something wrong occured.');
+        disp('Please check the function and initial conditions.');
+    end
+end
+
+%Aitken加速后 定点迭代法求根
+function [value,iterations] = A_fixed_point(fun,x0,maxits,tolerance)
+    
+    x1 = x0+1;
+    iterations = 0;
+    
+    while abs(x1-x0)>tolerance && iterations<maxits
+        iterations = iterations +1 ;    %+2 or +1?
+        x1 = x0;
+        y1 = feval(fun,x0);
+        y2 = feval(fun,y1);
+        x0 = x1 - ((y1-x0)^2)/(x0+y2-2*y1);
+    end
+    
+    value = x0;
+    
+    if iterations == maxits || value == inf  ||value == -Inf
+        disp('Something wrong occured.');
+        disp('Please check the function and initial conditions.');
+    end
+end
