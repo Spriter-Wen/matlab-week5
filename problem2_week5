@@ -1,0 +1,47 @@
+%基本数值计算方法小组作业
+%第5周习题第2题
+
+%第6组 20200405
+%定点迭代法求方程的根
+
+close all;
+clear all;
+clc;
+
+f1 = @(x)(exp(-x));
+
+maxits = 30;    %最大迭代次数
+tolerance = 1e-5;   %根的误差
+
+x0 = 0.5;   %起始值
+
+[root,iterations] = fixed_point(f1,x0,maxits,tolerance);
+
+if iterations == 30
+    disp('No root found')
+else
+    disp(['Root = ' num2str(root) ' found in ' ...
+        int2str(iterations) ' iterations.'])
+end
+
+%定点迭代法求根
+%fun为待求根函数
+%x0为迭代起始值
+%maxits为最大迭代次数
+%tolerance为容许误差
+%不能解决发散的情况，使用前需要考察函数是否适合用定点迭代法求根
+
+function [value,iterations] = fixed_point(fun,x0,maxits,tolerance)
+    x1 = feval(fun,x0);
+    iterations = 1;
+    while abs(x1-x0)>tolerance && iterations<maxits
+        iterations = iterations +1 ;
+        x0 = x1;
+        x1 = feval(fun,x0);
+    end
+    value = x1;
+    if iterations == maxits || value == Inf
+        disp('Something wrong occured.')
+        disp('Please check the function and initial conditions.');
+    end
+end
