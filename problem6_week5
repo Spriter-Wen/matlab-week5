@@ -1,0 +1,56 @@
+%基本数值计算方法小组作业
+%第5周习题第6题
+
+%第6组 20200405
+%牛顿-拉弗森法解第6题
+
+close all;
+clear all;
+clc;
+
+v0 = 30;
+y0 = 1.8;
+y = 1;
+x = 90;
+g = 9.81;
+
+%设t = 1/cos(x)
+f1 = @(t)(x*sqrt(t^2 - 1) - g*x^2*t^2/(2*v0^2)+y0-y);
+diff_f1 = @(t)(x*t/sqrt(t^2-1) - g*x^2*t/v0^2);
+
+t0 = 2;     %迭代起始值
+maxits = 30;    %最大迭代次数
+tolerance = 1e-5;   %容许误差
+
+[root,iterations] = newton_method(f1,diff_f1,t0,maxits,tolerance);
+
+root = rad2deg(acos(1/root));   %求出θ0并化为角度
+
+disp('Newton-Raphson method:');
+disp(['θ0= ',num2str(root),'° found in ',num2str(iterations),' iterations.']);
+
+ %牛顿法求解fun = 0的根
+ %fun为待求根函数，diff_fun为fun的一阶导数
+ %x0为迭代初始值
+ %maxits为最大迭代次数
+ %tolerance为容许误差
+ 
+function [value,iterations] = newton_method(fun,diff_fun,x0,maxits,tolerance)
+    
+    iterations = 1;     %第一次迭代
+    x1 = x0 - feval(fun,x0)/feval(diff_fun,x0); %x1 = x0 - f(x0)/f'(x0)
+    
+    while abs(x1-x0)>tolerance && iterations < maxits
+        iterations = iterations + 1;
+        x0 = x1;
+        x1 = x0 - feval(fun,x0)/feval(diff_fun,x0);
+    end
+    
+    value = x1;
+    
+    if iterations == maxits || value == Inf || value ==-Inf
+        disp('Something wrong occured.');
+        disp('Please check the function and initial conditions.');
+    end
+end
+
