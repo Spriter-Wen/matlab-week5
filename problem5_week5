@@ -1,0 +1,92 @@
+%基本数值计算方法小组作业
+%第5周习题第5题
+
+%第6组 20200405
+%牛顿-拉弗森法和Halley法求方程的根并比较
+
+close all;
+clear all;
+clc;
+
+f1 = @(x)(5*x^7 + 2*x - 1);
+diff_f1 = @(x)(35*x^6 + 2);     %f1'(x)
+two_diff_f1 = @(x)(210*x^5);    %f1''(x)
+
+f2 = @(x)(x^(-3)-10);
+diff_f2 = @(x)(-3*x^(-4));      %f2'(x)
+two_diff_f2 = @(x)(12*x^(-5));  %f2''(x)
+
+x0 = 0.1;   %迭代初始值
+maxits = 30;    %最大迭代次数
+tolerance = 1e-5;   %容许误差
+
+[root_n_1,iterations_n_1] = newton_method(f1,diff_f1,x0,maxits,tolerance);
+%牛顿-拉弗森法求f1 = 0 的根并得到迭代次数
+[root_n_2,iterations_n_2] = newton_method(f2,diff_f2,x0,maxits,tolerance);
+%牛顿-拉弗森法求f2 = 0 的根并得到迭代次数
+[root_h_1,iterations_h_1] = Halley_method(f1,diff_f1,two_diff_f1,x0,maxits,tolerance);
+%Halley法求f1 = 0 的根并得到迭代次数
+[root_h_2,iterations_h_2] = Halley_method(f2,diff_f2,two_diff_f2,x0,maxits,tolerance);
+%Halley法求f2 = 0 的根并得到迭代次数
+
+
+%打印结果
+disp(['f1: ','Newton-Raphson method: ','Root= ',num2str(root_n_1),' found in '...
+      num2str(iterations_n_1),' iterations.']);
+disp(['f1: ','Halley method: ','Root= ',num2str(root_h_1),' found in '...
+      num2str(iterations_h_1),' iterations.']);
+disp(['f2: ','Newton-Raphson method: ','Root= ',num2str(root_n_2),' found in '...
+      num2str(iterations_n_2),' iterations.']);
+disp(['f2: ','Halley method: ','Root= ',num2str(root_h_2),' found in '...
+      num2str(iterations_h_2),' iterations.']);
+  
+ %牛顿法求解fun = 0的根
+ %fun为待求根函数，diff_fun为fun的一阶导数
+ %x0为迭代初始值
+ %maxits为最大迭代次数
+ %tolerance为容许误差
+function [value,iterations] = newton_method(fun,diff_fun,x0,maxits,tolerance)
+    
+    iterations = 1;     %第一次迭代
+    x1 = x0 - feval(fun,x0)/feval(diff_fun,x0); %x1 = x0 - f(x0)/f'(x0)
+    
+    while abs(x1-x0)>tolerance && iterations < maxits
+        iterations = iterations + 1;
+        x0 = x1;
+        x1 = x0 - feval(fun,x0)/feval(diff_fun,x0);
+    end
+    
+    value = x1;
+    
+    if iterations == maxits || value == Inf || value ==-Inf
+        disp('Something wrong occured.');
+        disp('Please check the function and initial conditions.');
+    end
+end
+
+ %Halley method
+ %fun为待求根函数，diff_fun为fun的一阶导数，two_diff_fun为fun的二阶导数
+ %x0为迭代初始值
+ %maxits为最大迭代次数
+ %tolerance为容许误差
+ 
+function [value,iterations] = Halley_method(fun,diff_fun,two_diff_fun,x0,maxits,tolerance)
+    
+    iterations = 1;         %第一次迭代
+    y0 = feval(fun,x0);
+    y1 = feval(diff_fun,x0);
+    y2 = feval(two_diff_fun,x0);
+    
+    x1 = x0 - (2*y0*y1)/(2*(y1^2)-y0*y2);
+    
+    while abs(x1-x0)>tolerance && iterations < maxits
+        iterations = iterations + 1;
+        x0 = x1;
+        y0 = feval(fun,x0);
+        y1 = feval(diff_fun,x0);
+        y2 = feval(two_diff_fun,x0);
+    
+        x1 = x0 - (2*y0*y1)/(2*(y1^2)-y0*y2);
+    end
+    value = x1;
+end
